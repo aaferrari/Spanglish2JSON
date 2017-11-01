@@ -43,7 +43,7 @@ def guardador():
 configuraciones=open("progreso.txt", "r+b")
 progreso = json.loads(configuraciones.read())
 #progreso={}
-palabras = open("/mnt/windows/Archivos promedios/Carpeta de pasaje/vzprp.dic", "r")
+palabras = open("palabras.txt", "r")
 linea = palabras.readline()
 ultima_encontrada = False
 ultimo_guardado=time.time()
