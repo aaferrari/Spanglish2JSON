@@ -1,0 +1,148 @@
+
+<html>
+   <head>
+      <style type="text/css">
+         .sikuli-code {
+            font-size: 20px;
+            font-family: "Osaka-mono", Monospace;
+            line-height: 1.5em;
+            display:table-cell;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            width: 99%;   /* remove horizontal scroll-bar when viewing in IE7 */
+         }
+         .sikuli-code img {
+            vertical-align: middle;
+            margin: 2px;
+            border: 1px solid #ccc;
+            padding: 2px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            -moz-box-shadow: 1px 1px 1px gray;
+            -webkit-box-shadow: 1px 1px 2px gray;
+         }
+         .kw {
+            color: blue;
+         }
+         .skw {
+            color: rgb(63, 127, 127);
+         }
+
+         .str {
+            color: rgb(128, 0, 0);
+         }
+
+         .dig {
+            color: rgb(128, 64, 0);
+         }
+
+         .cmt {
+            color: rgb(200, 0, 200);
+         }
+
+         h2 {
+            display: inline;
+            font-weight: normal;
+         }
+
+         .info {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            display: none;
+         }
+
+         a {
+            color: #9D2900;
+         }
+
+         body {
+            font-family: "Trebuchet MS", Arial, Sans-Serif;
+         }
+
+      </style>
+   </head>
+<body>
+<div class="info">
+<h2>Spanglish.sikuli</h2> <a href="Spanglish.zip">(Download this script)</a>
+</div>
+<pre class="sikuli-code">
+<span class="kw">import</span> sys
+<span class="kw">import</span> json
+<span class="kw">import</span> time
+<span class="cmt"># Si el script se usa en Windows:</span>
+<span class="cmt"># * Modificar pyperclip_path por el directorio correspondiente.</span>
+<span class="cmt"># * Cambiar las llamadas hacia paste_xsel() por paste()</span>
+<span class="cmt"># * Descomentar las siguientes lineas.</span>
+<span class="cmt">#pyperclip_path=u"/usr/lib/python2.7/site-packages/pyperclip"</span>
+<span class="cmt">#if pyperclip_path not in sys.path: sys.path.append(pyperclip_path)</span>
+<span class="cmt">#from pyperclip import paste</span>
+<span class="kw">import</span> subprocess
+
+ventana = Pattern(<img src="Ingresar texto.png" />).similar(<span class="dig">0.50</span>)
+<span class="cmt">#palabras = ["cat", "dog", "prueba", "sldkkkjorieefezriogdfrg", "algomas"]</span>
+<span class="cmt">#palabras = "esto es una prueba de uso para el script de Spanglish".split(" ")  </span>
+ultimo_guardado = time.time()
+
+<span class="kw">def</span> paste_xsel():
+    p = subprocess.Popen([<span class="str">'xsel'</span>, <span class="str">'-b'</span>, <span class="str">'-o'</span>],
+                         stdout=subprocess.PIPE, close_fds=True)
+    stdout, stderr = p.communicate()
+    <span class="kw">return</span> stdout.decode(<span class="str">'utf-8'</span>)
+
+<span class="kw">def</span> traductor(palabra):
+    <span class="kw">if</span> <span class="kw">not</span> exists(ventana):
+        <span class="skw">rightClick</span>(Pattern(<span class="str">"icono del programa.PNG"</span>).similar(<span class="dig">0.50</span>))
+        <span class="skw">click</span>(<span class="str">"Boton de traduccion.PNG"</span>)
+    <span class="skw">type</span>(Pattern(<img src="Ingresar texto.png" />).similar(<span class="dig">0.50</span>).targetOffset(-<span class="dig">49</span>,<span class="dig">15</span>), Key.DOWN + palabra + Key.ENTER)
+    <span class="cmt">#click(Pattern("Ingresar texto.png").similar(0.50).targetOffset(140,-20))</span>
+    <span class="kw">if</span> exists(<span class="str">"Copiar traduccion.PNG"</span>, <span class="dig">1</span>):
+        <span class="cmt">#print "Boton encontrado"</span>
+        <span class="skw">click</span>(<span class="str">"Copiar traduccion.PNG"</span>)
+    <span class="kw">else</span>: <span class="kw">return</span> <span class="str">""</span>
+    <span class="cmt">#click(Pattern("Ingresar texto.png").targetOffset(137,10))</span>
+    <span class="kw">return</span> <span class="str">"\n"</span>.join(paste_xsel().split(<span class="str">"\n"</span>)[<span class="dig">1</span>:-<span class="dig">2</span>])
+
+<span class="kw">def</span> guardador():
+    <span class="cmt"># Sobreescribe progreso.txt con el diccionario "progreso" actual</span>
+    configuraciones.seek(<span class="dig">0</span>)
+    configuraciones.write(json.dumps(progreso))
+    configuraciones.flush()
+
+configuraciones=open(<span class="str">"progreso.txt"</span>, <span class="str">"r+b"</span>)
+progreso = json.loads(configuraciones.read())
+<span class="cmt">#progreso={}</span>
+palabras = open(<span class="str">"/mnt/windows/Archivos promedios/Carpeta de pasaje/vzprp.dic"</span>, <span class="str">"r"</span>)
+linea = palabras.readline()
+ultima_encontrada = False
+ultimo_guardado=time.time()
+
+<span class="cmt"># Continuamos donde nos quedamos la ultima vez</span>
+<span class="kw">if</span> progreso.has_key(<span class="str">"ultima"</span>):
+    <span class="kw">while</span> ultima_encontrada == False:
+        <span class="kw">if</span> linea == progreso[<span class="str">"ultima"</span>]:
+            ultima_encontrada = True
+        linea = palabras.readline()
+
+<span class="kw">while</span> linea != <span class="str">""</span>:
+    palabra = linea.strip()
+    <span class="kw">print</span> <span class="str">"%s Procesando %s: "</span> % (time.strftime(<span class="str">"[%d/%m/%Y %H:%M:%S]"</span>, time.localtime()), palabra),
+    resultado = traductor(palabra)
+    <span class="kw">if</span> resultado != <span class="str">'+{\xc3\xb1\xc3\xbd3'</span> <span class="kw">and</span> resultado != <span class="str">""</span>:
+        <span class="kw">if</span> progreso.has_key(resultado): progreso[resultado].append(palabra)
+        <span class="kw">else</span>: progreso[resultado] = [palabra]
+        progreso[<span class="str">"ultima"</span>] = linea
+        <span class="kw">print</span> <span class="str">"definicion/es encontrada/s"</span>
+    <span class="kw">else</span>: <span class="kw">print</span> <span class="str">"nada encontrado"</span>
+    <span class="kw">if</span> time.time() &gt;= (ultimo_guardado + <span class="dig">5</span>*<span class="dig">60</span>):
+        guardador()
+        ultimo_guardado = time.time()
+    linea = palabras.readline()
+    <span class="cmt">#print progreso</span>
+
+</pre>
+</body>
+</html>
